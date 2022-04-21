@@ -50,6 +50,7 @@ public class MyButtonRect {
         this.mouseClicked=mouseClicked;
     }
 
+    public boolean getMouseClicked(){return mouseClicked;}
     public Rectangle getBounds(){
         return bounds;
     }

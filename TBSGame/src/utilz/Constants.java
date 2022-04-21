@@ -1,6 +1,16 @@
 package utilz;
 
 public class Constants {
+    public static class PlayerNumber{
+        public static final int VI=0;
+        public static final int JAYCE=1;
+        public static final int VIKTOR=2;
+        public static final int CAITLYN=3;
+        public static final int SEVIKA=4;
+        public static final int SINGED=5;
+        public static final int SILCO=6;
+        public static final int JINX=7;
+    }
 
     public static class PlayerConstants{
         public static final int IDLE=0;

@@ -1,7 +1,8 @@
 package main.gamestates;
 
-public enum GamesStates {
-    PLAYER1, PLAYER2, ACTION;
+import entities.PlayerSilco;
 
-    public static GamesStates gameState=PLAYER1;
+public enum GamesStates {
+    PLAYER1, PLAYER2, ACTION, END, START;
+    public static GamesStates gameState=START;
 }

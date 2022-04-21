@@ -1,10 +1,12 @@
 package inputs;
 
 import main.GamePanel;
+import main.gamestates.Action;
 import main.gamestates.GamesStates;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Arrays;
 
 
 public class MouseInputs implements MouseListener {
@@ -28,13 +30,16 @@ public class MouseInputs implements MouseListener {
             default:
                 break;
         }
-
+        broadcastClick(e);
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
             switch (GamesStates.gameState) {
+                case START:
+                    gamePanel.getGame().getStart().mousePressed(e);
+                    break;
                 case PLAYER1:
                     gamePanel.getGame().getPlayer1().mousePressed(e);
                     break;
@@ -45,8 +50,6 @@ public class MouseInputs implements MouseListener {
                 default:
                     break;
             }
-
-
         }
     }
 
@@ -54,6 +57,9 @@ public class MouseInputs implements MouseListener {
     public void mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
             switch (GamesStates.gameState) {
+                case START:
+                    gamePanel.getGame().getStart().mouseReleased(e);
+                    break;
                 case PLAYER1:
                     gamePanel.getGame().getPlayer1().mouseReleased(e);
                     break;
@@ -63,11 +69,8 @@ public class MouseInputs implements MouseListener {
                 case ACTION:
                 default:
                     break;
-
             }
-
         }
-
     }
 
     @Override
@@ -78,5 +81,19 @@ public class MouseInputs implements MouseListener {
     @Override
     public void mouseExited(MouseEvent e) {
 
+    }
+
+    public void broadcastClick(MouseEvent e){
+        int x=e.getX(), y=e.getY();
+        if ((GamesStates.gameState != GamesStates.ACTION) && (GamesStates.gameState != GamesStates.START) && (GamesStates.gameState != GamesStates.END)){
+            gamePanel.getGame().getPlayer1().getPlayerVi().spriteClicked(x,y);
+            gamePanel.getGame().getPlayer1().getPlayerJayce().spriteClicked(x,y);
+            gamePanel.getGame().getPlayer1().getPlayerViktor().spriteClicked(x,y);
+            gamePanel.getGame().getPlayer1().getPlayerCaitlyn().spriteClicked(x,y);
+            gamePanel.getGame().getPlayer2().getPlayerSevika().spriteClicked(x,y);
+            gamePanel.getGame().getPlayer2().getPlayerSinged().spriteClicked(x,y);
+            gamePanel.getGame().getPlayer2().getPlayerSilco().spriteClicked(x,y);
+            gamePanel.getGame().getPlayer2().getPlayerJinx().spriteClicked(x,y);
+        }
     }
 }

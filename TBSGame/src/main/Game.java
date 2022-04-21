@@ -1,9 +1,8 @@
 package main;
 
-import main.gamestates.Action;
-import main.gamestates.GamesStates;
-import main.gamestates.Player1;
-import main.gamestates.Player2;
+import main.gamestates.*;
+import style.ManaBar;
+import style.Sound;
 
 import java.awt.*;
 
@@ -11,22 +10,45 @@ public class Game implements Runnable{
     //Game stuff
     private GameWindow gameWindow;
     private GamePanel gamePanel;
+    private ManaBar manaBar;
+    private Sound sound;
     private Thread gameThread;
     private final int FPS_SET=120;
     private final int UPS_SET=200;
     //Game states
-    private Player1 player1=new Player1(this);
-    private Player2 player2=new Player2(this);
-    private Action action=new Action(this);
+    private Player1 player1;
+    private Player2 player2;
+    private Action action;
+    private End end;
+    private Start start;
+
+    public static int[][] effectRoundLeft;
+    public static float[][] effectRatio;
+
+    public static int manaPlayer1;
+    public static int manaPlayer2;
+
+    public static int ROUND=1;
 
     public Game(){
-        GamesStates.gameState=GamesStates.PLAYER1;
-        getPlayer1().initButtons();
-        getPlayer1().initClasses();
-        getPlayer2().initClasses();
+        player1=new Player1(this);
+        player2=new Player2(this);
+        action=new Action(this);
+        end=new End(this);
+        start = new Start(this);
+        manaBar = new ManaBar(this);
+        manaBar.loadImage();
         gamePanel = new GamePanel(this);
         gameWindow = new GameWindow(gamePanel);
+        getPlayer1().initClasses();
+        getPlayer2().initClasses();
+        initEffectTables();
+        getPlayer1().initButtons();
+
+        GamesStates.gameState=GamesStates.START;
+
         gamePanel.requestFocus();
+        start.update();
         startGameLoop();
     }
 
@@ -38,15 +60,18 @@ public class Game implements Runnable{
 
     //Update the entire logical / visual
     public void update(){
-        if (GamesStates.gameState != GamesStates.ACTION){
+        if ((GamesStates.gameState != GamesStates.ACTION) && (GamesStates.gameState != GamesStates.START) && (GamesStates.gameState != GamesStates.END)){
             getPlayer1().update();
             getPlayer2().update();
         }
-        else
+        else if (GamesStates.gameState == GamesStates.ACTION)
             getAction().update();
     }
     public void render(Graphics g){
         switch (GamesStates.gameState){
+            case START:
+                getStart().draw(g);
+                break;
             case PLAYER1:
                 getPlayer1().draw(g);
                 break;
@@ -54,17 +79,22 @@ public class Game implements Runnable{
                 getPlayer2().draw(g);
                 break;
             case ACTION:
+                break;
+            case END:
             default:
+                getEnd().draw(g);
                 break;
         }
-        getPlayer1().getPlayerVi().render(g);
-        getPlayer1().getPlayerJayce().render(g);
-        getPlayer1().getPlayerViktor().render(g);
-        getPlayer1().getPlayerCaitlyn().render(g);
-        getPlayer2().getPlayerSevika().render(g);
-        getPlayer2().getPlayerSinged().render(g);
-        getPlayer2().getPlayerSilco().render(g);
-        getPlayer2().getPlayerJinx().render(g);
+        if (GamesStates.gameState != GamesStates.START) {
+            getPlayer1().getPlayerVi().render(g);
+            getPlayer1().getPlayerJayce().render(g);
+            getPlayer1().getPlayerViktor().render(g);
+            getPlayer1().getPlayerCaitlyn().render(g);
+            getPlayer2().getPlayerSevika().render(g);
+            getPlayer2().getPlayerSinged().render(g);
+            getPlayer2().getPlayerSilco().render(g);
+            getPlayer2().getPlayerJinx().render(g);
+        }
     }
 
     //FPS/UPS check + PANEL update
@@ -109,8 +139,36 @@ public class Game implements Runnable{
         }
     }
 
+    public int winningTeam(){
+        if (player1.getPlayerVi().health<=0 && player1.getPlayerJayce().health<=0 && player1.getPlayerViktor().health<=0 && player1.getPlayerCaitlyn().health<=0){
+            return 2;
+        } else {
+            return 1;
+        }
+    }
+
+    public void initEffectTables(){
+        effectRatio=new float[8][4];
+        effectRoundLeft=new int [8][4];
+        for (int i=0;i<8;i++){
+            for (int j=0;j<4;j++){
+                effectRoundLeft[i][j]=0;
+                if (j==0)
+                    effectRatio[i][j]=0;
+                else
+                    effectRatio[i][j]=1;
+            }
+        }
+    }
+
     //Getters
     public Player1 getPlayer1() {return player1;}
     public Player2 getPlayer2(){return player2;}
     public Action getAction() {return action;}
+    public End getEnd() {return end;}
+    public Start getStart(){return start;}
+
+    public ManaBar getManaBar() {
+        return manaBar;
+    }
 }

@@ -35,7 +35,7 @@ public class MyButtonNext {
         if (mouseClicked){g.setColor(Color.lightGray);}
         else{
             if (GamesStates.gameState==GamesStates.PLAYER1)
-                g.setColor(Color.PINK);
+                g.setColor(Color.CYAN);
             else
                 g.setColor(Color.RED);
         }

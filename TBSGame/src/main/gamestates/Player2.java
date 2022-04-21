@@ -8,6 +8,9 @@ import main.Game;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.util.Arrays;
+
+import static utilz.Constants.PlayerNumber.*;
 
 public class Player2 extends State implements StateMethods {
     //Menu of each character
@@ -29,6 +32,9 @@ public class Player2 extends State implements StateMethods {
     private int totalAction;
     public int actionSevika=0, actionSinged=0, actionSilco=0, actionJinx=0;
     private boolean nextReady=false;
+    //Conditions
+    private String attacker=new String("");
+    private boolean moveAllowed=true;
 
     public Player2(Game game) {
         super(game);
@@ -36,10 +42,11 @@ public class Player2 extends State implements StateMethods {
 
     //Initialize players and buttons
     public void initClasses() {
-        playerSevika = new PlayerSevika(600,300, getGame(),100,60,80,40);
-        playerSinged = new PlayerSinged(700,300,getGame(), 100, 60, 60, 60);
-        playerSilco = new PlayerSilco(800,300,getGame(),100,60,50,70);
-        playerJinx = new PlayerJinx(900,300,getGame(), 100, 80, 40, 80);
+        Game.manaPlayer2=10;
+        playerSevika = new PlayerSevika(SEVIKA,600,300, getGame(), "Sevika", 2,100,60,80,20);
+        playerSinged = new PlayerSinged(SINGED,700,300,getGame(), "Singed", 2, 100, 60, 60, 40);
+        playerSilco = new PlayerSilco(SILCO,800,300,getGame(), "Silco", 2,100,60,50,60);
+        playerJinx = new PlayerJinx(JINX,900,300,getGame(), "Jinx", 2, 100, 80, 40, 80);
     }
     public void initButtons() {
         int[] x=new int[3];
@@ -103,32 +110,49 @@ public class Player2 extends State implements StateMethods {
         playerSinged.update();
         playerSilco.update();
         playerJinx.update();
+
         totalAction=actionSevika+actionSinged+actionSilco+actionJinx;
     }
 
     @Override
     public void draw(Graphics g) {
-        buttonSevika.draw(g);       //Vi's buttons
-        buttonSevika2.draw(g);
-        buttonSevika3.draw(g);
-        buttonSevika4.draw(g);
+        getGame().getManaBar().showManaBar(g);
 
-        buttonSinged.draw(g);       //Viktor's buttons
-        buttonSinged2.draw(g);
-        buttonSinged3.draw(g);
-        buttonSinged4.draw(g);
-
-        buttonSilco.draw(g);       //Jayce's buttons
-        buttonSilco2.draw(g);
-        buttonSilco3.draw(g);
-        buttonSilco4.draw(g);
-
-        buttonJinx.draw(g);       //Caitlyn's buttons
-        buttonJinx2.draw(g);
-        buttonJinx3.draw(g);
-        buttonJinx4.draw(g);
+        if (playerSevika.health>0) {
+            buttonSevika.draw(g);       //Sevika's buttons
+            buttonSevika2.draw(g);
+            buttonSevika3.draw(g);
+            buttonSevika4.draw(g);
+            playerSevika.showInfo(0, 600, 100, "SEVIKA", g);
+        }
+        if (playerSinged.health>0) {
+            buttonSinged.draw(g);       //Singed's buttons
+            buttonSinged2.draw(g);
+            buttonSinged3.draw(g);
+            buttonSinged4.draw(g);
+            playerSinged.showInfo(300, 600, 100, "SINGED", g);
+        }
+        if (playerSilco.health>0) {
+            buttonSilco.draw(g);       //Silco's buttons
+            buttonSilco2.draw(g);
+            buttonSilco3.draw(g);
+            buttonSilco4.draw(g);
+            playerSilco.showInfo(600, 600, 100, "SILCO", g);
+        }
+        if (playerJinx.health>0) {
+            buttonJinx.draw(g);       //Jinx's buttons
+            buttonJinx2.draw(g);
+            buttonJinx3.draw(g);
+            buttonJinx4.draw(g);
+            playerJinx.showInfo(900, 600, 100, "JINX", g);
+        }
 
         buttonNext.draw(g);       //Next state button
+
+        if (!moveAllowed){
+            g.setFont(new Font("Times New Roman",Font.PLAIN,28));
+            g.drawString("Select your target!",480,580);
+        }
     }
 
     @Override
@@ -141,13 +165,12 @@ public class Player2 extends State implements StateMethods {
     }
     @Override
     public void mouseReleased(MouseEvent e) {
-        getButtonNext().setMouseClicked(false);
+        buttonNext.setMouseClicked(false);
         if (nextReady){
             eraseButtons();
             getGame().getAction().initClasses();
             GamesStates.gameState = GamesStates.ACTION;
         }
-
     }
 
     @Override
@@ -166,7 +189,13 @@ public class Player2 extends State implements StateMethods {
     public void setActionSinged(int actionSinged) {this.actionSinged = actionSinged;}
     public void setActionSilco(int actionSilco) {this.actionSilco = actionSilco;}
     public void setActionJinx(int actionJinx) {this.actionJinx = actionJinx;}
+
+    public void setMoveAllowed(boolean moveAllowed) {this.moveAllowed = moveAllowed;}
+    public void setAttacker(String attacker) {this.attacker = attacker;}
+
     //Getters
+    public boolean isMoveAllowed() {return moveAllowed;}
+
     public PlayerSevika getPlayerSevika(){return playerSevika;}
     public PlayerSinged getPlayerSinged() {return playerSinged;}
     public PlayerSilco getPlayerSilco() {return playerSilco;}
@@ -226,4 +255,11 @@ public class Player2 extends State implements StateMethods {
         return buttonJinx4;
     }
 
+    public String getAttacker() {return attacker;}
+
+    public int getTotalAction() {
+        return totalAction;
+    }
+
+    public void setNextReady(boolean nextReady) {this.nextReady=nextReady;}
 }

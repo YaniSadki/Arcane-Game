@@ -12,6 +12,9 @@ import main.Game;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 
+import static utilz.Constants.PlayerConstants.IDLE;
+import static utilz.Constants.PlayerNumber.*;
+
 public class Player1 extends State implements StateMethods {
     //Menu of each character
     private MyButton buttonVi,buttonVi2;
@@ -32,8 +35,9 @@ public class Player1 extends State implements StateMethods {
     private int totalAction;
     public int actionVi=0, actionJayce=0, actionViktor=0, actionCaitlyn=0;
     private boolean nextReady=false;
-    private boolean init=true;
-    //Links between states
+    //Conditions
+    private String attacker=new String("");
+    private boolean moveAllowed=true;
 
     public Player1(Game game) {
         super(game);
@@ -41,10 +45,11 @@ public class Player1 extends State implements StateMethods {
 
     //Initialize players and buttons
     public void initClasses() {
-        playerVi = new PlayerVi(300,300, getGame(), 100, 60, 80, 40);
-        playerJayce = new PlayerJayce(200,300,getGame(), 100, 60, 60, 60);
-        playerViktor = new PlayerViktor(100,300,getGame(), 100, 60, 60, 50);
-        playerCaitlyn = new PlayerCaitlyn(0,300,getGame(), 100, 80, 40, 80);
+        Game.manaPlayer1=10;
+        playerVi = new PlayerVi(VI,300,300, getGame(), "Vi",1, 100, 60, 80, 10);
+        playerJayce = new PlayerJayce(JAYCE,200,300,getGame(), "Jayce", 1,100, 60, 60, 30);
+        playerViktor = new PlayerViktor(VIKTOR,100,300,getGame(), "Viktor", 1,100, 60, 60, 50);
+        playerCaitlyn = new PlayerCaitlyn(CAITLYN,0,300,getGame(), "Caitlyn", 1,100, 80, 40, 70);
     }
     public void initButtons() {
         int[] x=new int[3];
@@ -109,32 +114,49 @@ public class Player1 extends State implements StateMethods {
         playerJayce.update();
         playerViktor.update();
         playerCaitlyn.update();
+
         totalAction=actionVi+actionJayce+actionCaitlyn+actionViktor;
     }
 
     @Override
     public void draw(Graphics g) {
-        buttonVi.draw(g);       //Vi's buttons
-        buttonVi2.draw(g);
-        buttonVi3.draw(g);
-        buttonVi4.draw(g);
+        getGame().getManaBar().showManaBar(g);
 
-        buttonJayce.draw(g);       //Viktor's buttons
-        buttonJayce2.draw(g);
-        buttonJayce3.draw(g);
-        buttonJayce4.draw(g);
-
-        buttonViktor.draw(g);       //Jayce's buttons
-        buttonViktor2.draw(g);
-        buttonViktor3.draw(g);
-        buttonViktor4.draw(g);
-
-        buttonCaitlyn.draw(g);       //Caitlyn's buttons
-        buttonCaitlyn2.draw(g);
-        buttonCaitlyn3.draw(g);
-        buttonCaitlyn4.draw(g);
+        if (playerVi.health>0) {
+            buttonVi.draw(g);       //Vi's buttons
+            buttonVi2.draw(g);
+            buttonVi3.draw(g);
+            buttonVi4.draw(g);
+            playerVi.showInfo(900,600,100,"VI",g);
+        }
+        if (playerJayce.health>0) {
+            buttonJayce.draw(g);       //Viktor's buttons
+            buttonJayce2.draw(g);
+            buttonJayce3.draw(g);
+            buttonJayce4.draw(g);
+            playerJayce.showInfo(600, 600, 100, "JAYCE", g);
+        }
+        if (playerViktor.health>0) {
+            buttonViktor.draw(g);       //Jayce's buttons
+            buttonViktor2.draw(g);
+            buttonViktor3.draw(g);
+            buttonViktor4.draw(g);
+            playerViktor.showInfo(300, 600, 100, "VIKTOR", g);
+        }
+        if (playerCaitlyn.health>0){
+            buttonCaitlyn.draw(g);       //Caitlyn's buttons
+            buttonCaitlyn2.draw(g);
+            buttonCaitlyn3.draw(g);
+            buttonCaitlyn4.draw(g);
+            playerCaitlyn.showInfo(0,600,100,"CAITLYN",g);
+        }
 
         buttonNext.draw(g);     //Next state button
+
+        if (!moveAllowed){
+            g.setFont(new Font("Times New Roman",Font.PLAIN,28));
+            g.drawString("Select your target!",480,580);
+        }
     }
 
     @Override
@@ -147,12 +169,12 @@ public class Player1 extends State implements StateMethods {
     }
     @Override
     public void mouseReleased(MouseEvent e) {
+        buttonNext.setMouseClicked(false);
         if (nextReady){
             getGame().getPlayer2().initButtons();
             eraseButtons();
             GamesStates.gameState = GamesStates.PLAYER2;
-        }         //A enlever plus tard
-        buttonNext.setMouseClicked(false);
+        }
     }
 
     @Override
@@ -172,7 +194,11 @@ public class Player1 extends State implements StateMethods {
     public void setActionViktor(int actionViktor) {this.actionViktor = actionViktor;}
     public void setActionCaitlyn(int actionCaitlyn) {this.actionCaitlyn = actionCaitlyn;}
 
+    public void setMoveAllowed(boolean moveAllowed) {this.moveAllowed = moveAllowed;}
+    public void setAttacker(String attacker) {this.attacker = attacker;}
     //Getters
+    public boolean isMoveAllowed() {return moveAllowed;}
+
     public PlayerVi getPlayerVi(){return playerVi;}
     public PlayerJayce getPlayerJayce() {return playerJayce;}
     public PlayerViktor getPlayerViktor() {return playerViktor;}
@@ -196,5 +222,10 @@ public class Player1 extends State implements StateMethods {
     public MyButtonRect getButtonCaitlyn3() {return buttonCaitlyn3;}
     public MyButtonRect getButtonCaitlyn4() {return buttonCaitlyn4;}
 
-    public boolean isInit() {return init;}
+    public String getAttacker() {return attacker;}
+
+    public int getTotalAction() {
+        return totalAction;
+    }
+    public void setNextReady(boolean nextReady) {this.nextReady=nextReady;}
 }
